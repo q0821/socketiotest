@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Title Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <!--[if lt IE 9]>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+      .bottom-control{
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+      }
+      
+    </style>
+
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    
+    <div class="bottom-control">
+      <button type="button" class="btn btn-default" id="G1Plus">G1+Random</button>
+      <button type="button" class="btn btn-default" id="G2Plus">G2+Random</button>
+      <button type="button" class="btn btn-default" id="JoinG1">Join G1</button>
+      <button type="button" class="btn btn-default" id="JoinG2">Join G2</button>  
+    </div>
+ 
+    <!--<form action="">
+      <input id="m" autocomplete="off" /><button>Send</button>
+    </form>-->
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      $(function () {
+        var socket = io();
+        // 按下G1 + Random 觸發 socket g1 plus event
+        $('#G1Plus').on('click',function(){
+          socket.emit('g1 plus', Math.random()*100);
+          return false;
+        });
+        
+        // 當socket 回傳g1 plus 訊息時，把訊息加入訊息
+        socket.on('g1 plus', function(msg){
+          $('#messages').append($('<li>').text(msg));
+        });
+
+        //  加入 G1
+        $('#JoinG1').on('click',function(){
+          socket.emit('joingroup1')
+          return false;
+        });
+
+        // 把G1 歷史資料更新到畫面上
+        socket.on('g1 history', function(msg){
+          // console.log(msg);
+          $('#messages').html('');
+          msg.forEach(function(text){
+            // console.log(text);
+            $('#messages').append($('<li>').text(text));
+          })
+        });
+
+        // G2 的部分比照辦理
+        $('#G2Plus').on('click',function(){
+          socket.emit('g2 plus', Math.random()*100);
+          return false;
+        });
+
+        socket.on('g2 plus', function(msg){
+          $('#messages').append($('<li>').text(msg));
+        });
+
+        $('#JoinG2').on('click',function(){
+          socket.emit('joingroup2')
+          return false;
+        });
+
+        socket.on('g2 history', function(msg){
+          // console.log(msg);
+          $('#messages').html('');
+          msg.forEach(function(text){
+            // console.log(text);
+            $('#messages').append($('<li>').text(text));
+          })
+        });
+
+      });
+    </script>
+    
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </body>
+</html>
